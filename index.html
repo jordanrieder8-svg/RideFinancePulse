@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>RideFinance Pulse</title>
+  <meta name="description" content="Auto-updating market headlines for quick daily briefings."/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <header>
+    <h1>RideFinance Pulse</h1>
+    <p class="sub">Scan headlines fast. Draft posts faster.</p>
+    <div id="meta"></div>
+    <input id="search" placeholder="Filter by keyword or source..."/>
+  </header>
+
+  <main id="feed" aria-live="polite"></main>
+
+  <footer>
+    <p><a href="post.txt" target="_blank" rel="noopener">Auto-drafted X post</a></p>
+  </footer>
+
+  <script>
+    async function load() {
+      const r = await fetch("news.json?cb=" + Date.now());
+      const data = await r.json();
+      document.getElementById("meta").textContent =
+        `Updated ${data.generated_at} • ${data.count} headlines`;
+
+      const feed = document.getElementById("feed");
+      feed.innerHTML = "";
+      for (const item of data.items) {
+        const card = document.createElement("article");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="card-head">
+            <a href="${item.url}" target="_blank" rel="noopener">
+              ${item.title ?? ""}
+            </a>
+          </div>
+          <div class="card-sub">
+            <span>${item.source ?? "Unknown"}</span>
+            <span>•</span>
+            <time>${new Date(item.publishedAt).toLocaleString()}</time>
+          </div>
+          <p>${item.description ?? ""}</p>
+        `;
+        feed.appendChild(card);
+      }
+
+      const input = document.getElementById("search");
+      input.addEventListener("input", () => {
+        const q = input.value.toLowerCase();
+        for (const card of feed.children) {
+          const text = card.textContent.toLowerCase();
+          card.style.display = text.includes(q) ? "" : "none";
+        }
+      });
+    }
+    load();
+  </script>
+</body>
+</html>

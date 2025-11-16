@@ -9,19 +9,19 @@ PAGE_SIZE = 50
 
 def get(url):
     req = Request(url, headers={"User-Agent": "Mozilla/5.0"})
-    with urlopen(req, timeout=20) as r:
-        return r.read().decode("utf-8")
-
-def fetch_news():
-    if not API_KEY:
-        raise RuntimeError("Missing NEWSAPI_KEY environment variable")
-
-    params = {
-        "q": QUERY,
-        "language": "en",
-        "sortBy": "publishedAt",
-        "pageSize": PAGE_SIZE,
-        "apiKey": API_KEY
+    QUERY = os.environ.get("NEWS_QUERY", 
+    # Comprehensive financial news filter covering:
+    # Stocks, Earnings, Market Movers, Pre/Post Market, Indices, Credit, Commodities, Futures
+    "stocks OR equities OR stock market OR share price OR "
+    "earnings OR earnings report OR quarterly earnings OR revenue OR profit OR EPS OR "
+    "market movers OR biggest movers OR top gainers OR top losers OR stock surge OR stock plunge OR "
+    "pre-market OR premarket OR post-market OR after hours OR market close OR market open OR "
+    "S&P 500 OR Dow Jones OR Nasdaq OR index OR indices OR market index OR "
+    "market up OR market down OR percentage gain OR percentage loss OR stock rally OR market decline OR "
+    "credit OR credit markets OR corporate bonds OR bond yields OR credit rating OR credit spread OR "
+    "commodities OR oil prices OR gold prices OR silver OR wheat OR corn OR natural gas OR crude oil OR "
+    "futures OR futures market OR commodity futures OR stock futures OR index futures"
+)
     }
     url = f"https://newsapi.org/v2/everything?{urlencode(params)}"
     data = json.loads(get(url))
